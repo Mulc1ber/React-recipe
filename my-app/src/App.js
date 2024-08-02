@@ -4,7 +4,7 @@ import data from './data.json';
 
 export const App = () => {
     // Можно задать 2 состояния — steps и activeIndex
-    // const [steps, setSteps] = useState(data);
+    const [steps, setSteps] = useState(data);
     const [activeIndex, setActiveIndex] = useState(1);
 
     // И определить 3 обработчика: Клик назад, Клик вперед, Начать сначала
@@ -17,7 +17,6 @@ export const App = () => {
     };
 
     const onClickStartOver = () => {
-        console.log('start over');
         setActiveIndex(1);
     };
 
@@ -53,15 +52,15 @@ export const App = () => {
                 <h1>Инструкция по готовке пельменей</h1>
                 <div className={styles.steps}>
                     <div className={styles['steps-content']}>
-                        {/* Для получения активного контента использйте steps и activeIndex */}
-                        {data.map(({ id, content }) => (activeIndex === Number(id) ? content : ''))}
+                        {steps.map(({ id, content }) =>
+                            activeIndex === Number(id) ? content : '',
+                        )}
                     </div>
                     <ul className={styles['steps-list']}>
-                        {data.map(({ id, title }) => (
+                        {steps.map(({ id, title }) => (
                             <li
                                 key={id}
-                                className={`${activeIndex > Number(id) ? styles.done : styles['steps-item']}
-                                            ${activeIndex === Number(id) ? styles.active : styles['steps-item']}`}
+                                className={`${styles['steps-item']} ${activeIndex > Number(id) ? styles.done : ''} ${activeIndex === Number(id) ? styles.active : ''}`}
                             >
                                 <button
                                     className={styles['steps-item-button']}
@@ -76,14 +75,16 @@ export const App = () => {
                     <div className={styles['buttons-container']}>
                         <button
                             className={styles.button}
-                            onClick={() => onClickBack(activeIndex)}
+                            onClick={onClickBack}
                             disabled={isOnFirstStep}
                         >
                             Назад
                         </button>
                         <button
                             className={styles.button}
-                            onClick={activeIndex === 7 ? onClickStartOver : onClickForward}
+                            onClick={
+                                activeIndex === steps.length ? onClickStartOver : onClickForward
+                            }
                         >
                             {isOnLastStep ? 'Начать сначала' : 'Далее'}
                         </button>
