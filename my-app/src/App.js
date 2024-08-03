@@ -4,8 +4,8 @@ import data from './data.json';
 
 export const App = () => {
     // Можно задать 2 состояния — steps и activeIndex
-    const [steps, setSteps] = useState(data);
-    const [activeIndex, setActiveIndex] = useState(1);
+    const [steps] = useState(data);
+    const [activeIndex, setActiveIndex] = useState(0);
 
     // И определить 3 обработчика: Клик назад, Клик вперед, Начать сначала
     const onClickForward = () => {
@@ -13,38 +13,18 @@ export const App = () => {
     };
 
     const onClickBack = () => {
-        setActiveIndex((prevState) => (prevState -= 1));
+        if (activeIndex > 0) {
+            setActiveIndex((prevState) => (prevState -= 1));
+        }
     };
 
     const onClickStartOver = () => {
-        setActiveIndex(1);
-    };
-
-    const handleClickOnStep = (id) => {
-        setActiveIndex(id);
+        setActiveIndex(0);
     };
 
     // И 2 переменных-флага — находимся ли мы на первом шаге, и находимся ли на последнем
-    let isOnFirstStep = true;
-    let isOnLastStep = false;
-
-    const handleStatusStep = () => {
-        switch (activeIndex) {
-            case 1:
-                isOnFirstStep = true;
-                isOnLastStep = false;
-                break;
-            case 7:
-                isOnFirstStep = false;
-                isOnLastStep = true;
-                break;
-            default:
-                isOnFirstStep = false;
-                isOnLastStep = false;
-                return;
-        }
-    };
-    handleStatusStep();
+    const isOnLastStep = activeIndex === steps.length - 1;
+    const isOnFirstStep = activeIndex === 0;
 
     return (
         <div className={styles.container}>
@@ -52,21 +32,26 @@ export const App = () => {
                 <h1>Инструкция по готовке пельменей</h1>
                 <div className={styles.steps}>
                     <div className={styles['steps-content']}>
-                        {steps.map(({ id, content }) =>
+                        {steps[activeIndex].content}
+                        {/* {steps.map(({ id, content }) =>
                             activeIndex === Number(id) ? content : '',
-                        )}
+                        )} */}
                     </div>
                     <ul className={styles['steps-list']}>
-                        {steps.map(({ id, title }) => (
+                        {steps.map(({ id, title }, index) => (
                             <li
                                 key={id}
-                                className={`${styles['steps-item']} ${activeIndex > Number(id) ? styles.done : ''} ${activeIndex === Number(id) ? styles.active : ''}`}
+                                className={
+                                    styles['steps-item'] +
+                                    (activeIndex === index ? ` ${styles.active}` : '') +
+                                    (activeIndex > index ? ` ${styles.done}` : '')
+                                }
                             >
                                 <button
                                     className={styles['steps-item-button']}
-                                    onClick={() => handleClickOnStep(Number(id))}
+                                    onClick={() => setActiveIndex(index)}
                                 >
-                                    {Number(id)}
+                                    {index + 1}
                                 </button>
                                 {title}
                             </li>
@@ -82,9 +67,7 @@ export const App = () => {
                         </button>
                         <button
                             className={styles.button}
-                            onClick={
-                                activeIndex === steps.length ? onClickStartOver : onClickForward
-                            }
+                            onClick={() => (isOnLastStep ? onClickStartOver() : onClickForward())}
                         >
                             {isOnLastStep ? 'Начать сначала' : 'Далее'}
                         </button>
